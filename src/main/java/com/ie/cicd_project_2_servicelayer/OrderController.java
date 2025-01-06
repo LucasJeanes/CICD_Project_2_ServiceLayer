@@ -6,8 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
@@ -20,48 +18,48 @@ public class OrderController {
     }
 
     @PostMapping("/newOrder")
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
-        Order createdOrder = orderService.createOrder(order);
+    public ResponseEntity<String> createOrder(@RequestBody Order order) {
+            String createdOrder = orderService.createOrder(order);
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        List<Order> orders = orderService.getAllOrders();
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+    public ResponseEntity<String> getAllOrders() {
+        String retrieveAllOrders = orderService.getAllOrders();
+        return new ResponseEntity<>(retrieveAllOrders, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<String> getOrderById(@PathVariable Long id) {
         try {
-            Order order = orderService.getOrderById(id);
-            return new ResponseEntity<>(order, HttpStatus.OK);
+            String retrieveOrderById = orderService.getOrderById(id);
+            return new ResponseEntity<>(retrieveOrderById, HttpStatus.OK);
         } catch (FeignException.NotFound e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable Long id) {
-        List<Order> orders = orderService.getOrdersByUserId(id);
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+    public ResponseEntity<String> getOrdersByUserId(@PathVariable Long id) {
+        String retrieveOrdersByUserId = orderService.getOrdersByUserId(id);
+        return new ResponseEntity<>(retrieveOrdersByUserId, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order orderDetails) {
+    public ResponseEntity<String> updateOrder(@PathVariable Long id, @RequestBody Order orderDetails) {
         try {
-            Order updatedOrder = orderService.updateOrder(id, orderDetails);
-            return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
+            String retrieveUpdatedOrder = orderService.updateOrder(id, orderDetails);
+            return new ResponseEntity<>(retrieveUpdatedOrder, HttpStatus.OK);
         } catch (FeignException.NotFound e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
+    public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
         try {
-            orderService.deleteOrder(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            String deletedOrder = orderService.deleteOrder(id);
+            return new ResponseEntity<>(deletedOrder, HttpStatus.NO_CONTENT);
         } catch (FeignException.NotFound e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

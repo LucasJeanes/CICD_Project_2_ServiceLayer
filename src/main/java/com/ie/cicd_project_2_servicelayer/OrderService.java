@@ -1,5 +1,6 @@
 package com.ie.cicd_project_2_servicelayer;
 
+import com.ie.cicd_project_2_servicelayer.repository.NotificationLayerClient;
 import com.ie.cicd_project_2_servicelayer.repository.OrderRepository;
 import com.ie.cicd_project_2_servicelayer.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,23 +14,27 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final NotificationLayerClient notificationLayerClient;
 
     @Autowired
     public OrderService(OrderRepository orderRepository,
-                        ProductRepository productRepository) {
+                        ProductRepository productRepository,
+                        NotificationLayerClient notificationLayerClient) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
+        this.notificationLayerClient = notificationLayerClient;
     }
 
     @Transactional
-    public Order createOrder(Order newOrder) {
+    public String createOrder(Order newOrder) {
         newOrder.setOrderDate(LocalDateTime.now());
         double totalPrice = 0;
         for(OrderItem item : newOrder.getOrderItems()) {
             Product product = productRepository.findById(item.getProduct().getId())
                     .orElseThrow(() -> new RuntimeException("ERROR: Product not found"));
             if(product.getQuantity() < item.getQuantity()) {
-                throw new RuntimeException("ERROR: Insufficient stock for product: " + product.getName());
+                throw new RuntimeException("ERROR: Insufficient stock for product: "
+                        + product.getName());
             }
             item.setProduct(product);
             product.setQuantity(product.getQuantity() - item.getQuantity());
@@ -38,33 +43,41 @@ public class OrderService {
         }
         newOrder.setTotalPrice(totalPrice);
         newOrder.setOrderDate(LocalDateTime.now());
-        return orderRepository.save(newOrder);
+        Order savedOrder = orderRepository.save(newOrder);
+        return notificationLayerClient.notifyOrderCreated(savedOrder);
     }
 
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public String getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return notificationLayerClient.notifyAllOrders(orders);
     }
 
-    public Order getOrderById(Long id) {
-        return orderRepository.findById(id)
+    public String getOrderById(Long id) {
+        Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("ERROR: Order not found"));
+        return notificationLayerClient.notifyOrderById(order);
     }
 
-    public List<Order> getOrdersByUserId(Long userId) {
-        return orderRepository.findByUserId(userId);
+    public String getOrdersByUserId(Long userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        return notificationLayerClient.notifyOrdersByUserId(userId, orders);
     }
 
     @Transactional
-    public Order updateOrder(Long id, Order orderDetails) {
-        Order order = getOrderById(id);
+    public String updateOrder(Long id, Order orderDetails) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("ERROR: Order not found"));
         order.setUserId(orderDetails.getUserId());
         order.setOrderItems(orderDetails.getOrderItems());
         order.setTotalPrice(orderDetails.getTotalPrice());
-        return orderRepository.save(order);
+
+        Order updatedOrder = orderRepository.save(order);
+        return notificationLayerClient.notifyOrderUpdated(updatedOrder);
     }
 
     @Transactional
-    public void deleteOrder(Long id) {
+    public String deleteOrder(Long id) {
         orderRepository.deleteById(id);
+        return notificationLayerClient.notifyOrderDeleted(id);
     }
 }
