@@ -1,5 +1,6 @@
 package com.ie.cicd_project_2_servicelayer;
 
+import com.ie.cicd_project_2_servicelayer.repository.NotificationLayerClient;
 import com.ie.cicd_project_2_servicelayer.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,26 +11,32 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepo;
+    private final NotificationLayerClient notificationLayerClient;
 
     @Autowired
-    public ProductService(ProductRepository productRepo) {
+    public ProductService(ProductRepository productRepo,
+                          NotificationLayerClient notificationLayerClient) {
         this.productRepo = productRepo;
+        this.notificationLayerClient = notificationLayerClient;
     }
 
-    public Product createProduct(Product product) {
-        return productRepo.save(product);
+    public String createProduct(Product product) {
+        Product savedProduct = productRepo.save(product);
+        return notificationLayerClient.notifyProductCreated(savedProduct);
     }
 
-    public List<Product> getAllProducts() {
-        return productRepo.findAll();
+    public String getAllProducts() {
+        List<Product> allProducts = productRepo.findAll();
+        return notificationLayerClient.notifyAllProducts(allProducts);
     }
 
-    public Product getProductById(Long id) {
-        return productRepo.findById(id)
+    public String getProductById(Long id) {
+        Product productById = productRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+        return notificationLayerClient.notifyProductById(productById);
     }
 
-    public Product updateProduct(Long id, Product productDetails) {
+    public String updateProduct(Long id, Product productDetails) {
         Product product = productRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
 
@@ -38,11 +45,12 @@ public class ProductService {
         product.setDescription(productDetails.getDescription());
         product.setQuantity(productDetails.getQuantity());
 
-        return productRepo.save(product);
+        Product updatedProduct = productRepo.save(product);
+        return notificationLayerClient.notifyProductUpdated(updatedProduct);
     }
 
     public String deleteProduct(Long id) {
         productRepo.deleteById(id);
-        return "Product deleted successfully";
+        return notificationLayerClient.notifyProductDeleted(id);
     }
 }
