@@ -57,7 +57,11 @@ class ProductServiceTest {
 
     @Test
     void testGetAllProducts() {
-        Product product = new Product(1L, "Test Product", 100.0, "Test_description", 10);
+        Product product = new Product(1L,
+                "Test Product",
+                100.0,
+                "Test_description",
+                10);
 
         when(productRepository.findAll()).thenReturn(Collections.singletonList(product));
         when(notificationLayerClient.notifyAllProducts(any()))
@@ -75,7 +79,11 @@ class ProductServiceTest {
 
     @Test
     void testGetProductById() {
-            Product product = new Product(1L, "Test Product", 100.0, "Test_description", 10);
+            Product product = new Product(1L,
+                    "Test Product",
+                    100.0,
+                    "Test_description",
+                    10);
 
             when(productRepository.findById(1L)).thenReturn(Optional.of(product));
             when(notificationLayerClient.notifyProductById(any(Product.class)))
@@ -93,7 +101,7 @@ class ProductServiceTest {
         Product existingProduct = new Product(1L,
                 "Test Product",
                 100.0,
-                "Description",
+                "Test_description",
                 10);
 
         Product updatedProduct = new Product();

@@ -30,7 +30,10 @@ public class UserServiceTest {
 
     @Test
     void testRegisterUser() {
-        User user = new User(1L, "test_user", "test@example.com", "testPassword");
+        User user = new User(1L,
+                "test_user",
+                "test@example.com",
+                "testPassword");
 
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(notificationLayerClient.notifyUserCreated(any(User.class)))
@@ -70,7 +73,6 @@ public class UserServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        //mockMvc.perform(get(""))
         when(notificationLayerClient.notifyUserById(any(User.class)))
                     .thenReturn("Retrieved user with ID: 1\n" + user);
 
@@ -111,11 +113,9 @@ public class UserServiceTest {
 
         String result = userService.updateUser(1L, updatedUser);
 
-        // Verify the result string
         assertEquals("User with ID: " + existingUser.getId()
                 + "\nUpdated: " + existingUser, result);
 
-        // Verify method calls
         verify(userRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).save(any(User.class));
         verify(notificationLayerClient, times(1)).notifyUserUpdated(existingUser);
@@ -130,10 +130,8 @@ public class UserServiceTest {
 
         String result = userService.deleteUser(userId);
 
-        // Verify the result string
         assertEquals("User with ID: " + userId + " deleted successfully", result);
 
-        // Verify method calls
         verify(userRepository, times(1)).deleteById(userId);
         verify(notificationLayerClient, times(1)).notifyUserDeleted(userId);
     }

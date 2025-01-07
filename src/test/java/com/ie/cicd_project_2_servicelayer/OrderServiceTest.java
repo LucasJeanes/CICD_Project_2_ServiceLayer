@@ -140,7 +140,7 @@ public class OrderServiceTest {
         Order updatedOrder = new Order();
         updatedOrder.setUserId(2L);
         updatedOrder.setTotalPrice(200.0);
-        updatedOrder.setOrderItems(Collections.emptyList()); // or set some order items if needed
+        updatedOrder.setOrderItems(Collections.emptyList());
 
         when(orderRepository.findById(1L)).thenReturn(Optional.of(existingOrder));
 
