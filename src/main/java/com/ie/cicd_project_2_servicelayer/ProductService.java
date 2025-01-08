@@ -40,11 +40,20 @@ public class ProductService {
         Product product = productRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
 
-        product.setName(productDetails.getName());
-        product.setPrice(productDetails.getPrice());
-        product.setDescription(productDetails.getDescription());
-        product.setQuantity(productDetails.getQuantity());
-
+        if(productDetails.getName() != null && !productDetails.getName().isEmpty()) {
+            product.setName(productDetails.getName());
+        }
+        if(productDetails.getPrice() > 0) {
+            product.setPrice(productDetails.getPrice());
+        } else if(productDetails.getPrice() <= 0) {
+            throw new IllegalArgumentException("Price must be greater than 0");
+        }
+        if(productDetails.getDescription() != null && !productDetails.getDescription().isEmpty()) {
+            product.setDescription(productDetails.getDescription());
+        }
+        if(productDetails.getQuantity() != null && productDetails.getQuantity() >= 0) {
+            product.setQuantity(productDetails.getQuantity());
+        }
         Product updatedProduct = productRepo.save(product);
         return notificationLayerClient.notifyProductUpdated(updatedProduct);
     }
