@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "notification-layer", url = "http://localhost:8083")
+@FeignClient(name = "notification-layer", url = "${feign.notification-layer.url}")
 public interface NotificationLayerClient {
     //USER API CONNECTIONS-----
     @PostMapping("/notify/user/created")
