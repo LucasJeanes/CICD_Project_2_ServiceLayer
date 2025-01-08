@@ -7,3 +7,6 @@ https://github.com/LucasJeanes/CICD_Project_1_ApplicationLayer
 
 Notification layer app can be found here: 
 https://github.com/LucasJeanes/CICD_Project_3_NotificationLayer
+
+Project setup guide can be found here:
+https://github.com/LucasJeanes/CICD_Project_1_ApplicationLayer
